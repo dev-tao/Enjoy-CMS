@@ -6,7 +6,7 @@ import hashlib
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:111111@localhost:33306/enjoycmspre'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:111111@localhost:33306/enjoycms'
 db = SQLAlchemy(app)
 
 
@@ -52,7 +52,7 @@ class EnjoycmsUser(db.Model):
     last_login_time = db.Column(db.DateTime)
     add_time = db.Column(db.DateTime)
     depart_names  = db.Column(db.String(30))
-    depart_ids = db.Column(db.Integer,nullable=False)
+    depart_ids = db.Column(db.Integer)
     role_names = db.Column(db.String(30))
 
     def __init__(self, login_name,name,pwd,sex,birthday,tel,mobile_phone,email,depart_names,depart_ids,role_names,add_time=None,last_login_time=None,state=None):
@@ -358,6 +358,65 @@ class EnjoycmsOperaLogs(db.Model):
 
     def __repr__(self):
         return '<EnjoycmsOperaLogs id:%r log_name:%r>' % self.id,self.log_name
+
+
+################################
+###投票相关表
+################################
+class EnjoycmsVoteCategory(db.Model):
+    __tablename__ = 'enjoycms_vote_category'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20),nullable=False)
+    state = db.Column(db.INTEGER)
+
+    def __init__(self, name,state = None):
+        self.name=name
+        if state is None:
+            state=1
+        self.state = state
+
+    def __repr__(self):
+        return '<EnjoycmsVoteCategory id:%r name:%r>' % self.id,self.name
+
+class EnjoycmsVote(db.Model):
+    __tablename__ = 'enjoycms_vote'
+    id = db.Column(db.Integer, primary_key=True)
+    category_id = db.Column(db.INTEGER)
+    name = db.Column(db.String(20),nullable=False)
+    img = db.Column(db.String(50),nullable=False)
+    desc = db.Column(db.String(200),nullable=False)
+    content = db.Column(db.TEXT)
+    state = db.Column(db.INTEGER)
+
+    def __init__(self,category_id, name,img,desc,content,state = None):
+        self.name=name
+        self.category_id = category_id
+        self.img = img
+        self.desc = desc
+        self.content = content
+        if state is None:
+            state=1
+        self.state = state
+
+    def __repr__(self):
+        return '<EnjoycmsVote id:%r name:%r>' % self.id,self.name
+
+
+class EnjoycmsVoteLog(db.Model):
+    __tablename__ = 'enjoycms_vote_log'
+    id = db.Column(db.Integer, primary_key=True)
+    category_id = db.Column(db.INTEGER)
+    ip = db.Column(db.String(20),nullable=False)
+    occur_time = db.Column(db.DATETIME,nullable=False)
+
+    def __init__(self,category_id, ip,ocur_time):
+        self.category_id = category_id
+        self.ip = ip
+        self.occur_time = ocur_time
+        self.content = content
+
+    def __repr__(self):
+        return '<EnjoycmsVoteLog id:%r name:%r>' % self.id,self.name
 
 
 
